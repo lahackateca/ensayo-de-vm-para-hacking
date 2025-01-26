@@ -8,9 +8,13 @@
 # Definir los colores
 blanco='\033[1;37m'
 rojoh='\033[31m'
+# rgb(116, 228, 228)
+aguamarinak='\033[38;5;44m'
 
 # logo la hackateca
-echo -e "\n${blanco}
+echo -e "\n
+
+	    ${blanco}
       ${rojoh}.::::::::        ${blanco}LA                                                                                                          
     ${rojoh}::::  .::::::                      :.${blanco}                            ${rojoh}.${blanco}                                                            
    ${rojoh}::::   : ::::::     ${blanco}####    ###   ${rojoh}.::::${blanco}  #######  ###     ####  ${rojoh}.:::::${blanco}########## ###########   :######      ######.            
@@ -20,10 +24,13 @@ echo -e "\n${blanco}
        ${rojoh}.     .:::      ${blanco}####    #${rojoh}::::    :::${blanco}###.  ##  ###### ###${rojoh}:::    :::${blanco}  ###      ###         ####.  ##   ####    ####          
          ${rojoh}:  .:         ${blanco}####    ###      ${rojoh}:::${blanco} #######  #####   ###      ${rojoh}:::${blanco}  ###      ###########  ######### .####     ####         
                        ####    ###      ${rojoh}:::${blanco} :#####   #####    ###     ${rojoh}:::${blanco}  ###      ###########   :######  ####      .####        
-
-
-
 \n"
+
+# nombre del script
+echo -e "${aguamarinak}╔═══════════════════════════════════╗
+                     \n      Ensayo de VM para hacking
+                     \n╚═══════════════════════════════════╝${blanco}"
+
 
 ### FUNCIONES
 
