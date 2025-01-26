@@ -57,11 +57,15 @@ cambiar_claves_ssh() {
 }
 
 # Actualizar el sistema y generar el script de actualización
-actualizar_sistema_y_descargar_script() {
+actualizar_sistema_y_crear_script() {
     banner "Creando y ejecutando el script de actualización..."
-    echo "sudo apt update -y && sudo apt full-upgrade -y && sudo apt --purge autoremove -y && sudo apt autoclean -y" > update-linux.sh
-    chmod +x update-linux.sh
-    sudo ./update-linux.sh
+    echo "sudo apt update -y && sudo apt full-upgrade -y && sudo apt --purge autoremove -y && sudo apt autoclean -y" > ~/.local/bin/actualizar-linux.sh &&
+    chmod 700  ~/.local/bin/actualizar-linux.sh &&
+    # añado 'soft link' para poder ejecutarlo siempre.
+    # Se podria añadir que se ejecute solo como un cron job cada semana, pero de momento no parece buena idea, ya que puede romper alguna herramienta
+    sudo ln -s ~/.local/bin/actualizar-linux.sh /usr/local/bin/actualizar-linux.sh &&
+    sudo actualizar-linux.sh
+
 }
 
 # Cambiar la contraseña del usuario kali
@@ -116,6 +120,7 @@ instalar_y_habilitar_ssh() {
 }
 
 # Crear carpeta Scripts en Home, para instalar las herramientas
+# TODO: modificarla para que cree carpetas para proyectos
 crear_carpeta_scripts() {
     banner "Creando estructura de carpetas..."
     mkdir ~/scripts && cd ~
@@ -124,17 +129,20 @@ crear_carpeta_scripts() {
 # Descargar e instalar programas de la lista de La Hackateca
 instalar_programas_hacking() {
     banner "Descargando e instalando programas de programas-hacking.list..."
-    cd ~/scripts &&
+    cd ~/.local/bin &&
     wget "https://raw.githubusercontent.com/lahackateca/proyectos/main/programas-hacking.list" &&
     sudo apt install $(cat programas-hacking.list | tr "\n" " ") -y
+    # TODO: crear link soft link para correr los programa más usados sin entrar a la carpeta
     banner "Instalando programas desde programas-hacking-de-git.sh..."
     curl -s https://raw.githubusercontent.com/lahackateca/proyectos/main/programas-hacking-de-git.sh | bash
     rm programas-hacking.list
     rm programas-hacking-de-git.sh
     # descargar el pequenio pentester ilustrado
+    banner "Instalando 'El pequeño pentester ilustrado'..."
     wget "https://raw.githubusercontent.com/lahackateca/el-pequenio-pentester-ilustrado/refs/heads/main/el-pequenio-pentester-ilustrado.sh" &&
-    mv el-pequenio-pentester-ilustrado.sh /bin &&
-    chmod +x el-pequenio-pentester-ilustrado.sh
+    chmod 700 el-pequenio-pentester-ilustrado.sh &&
+    # crear link soft link para correr el programa sin entrar a la carpeta
+    sudo ln -s ~/.local/bin/el-pequenio-pentester-ilustrado.sh /usr/local/bin/el-pequenio-pentester-ilustrado.sh &&
     cd ~
 }
 
@@ -154,7 +162,7 @@ instalar_vm_tools() {
 ejecutar_todos_los_comandos() {
     banner "Ejecutando todas las opciones..."
     cambiar_claves_ssh
-    actualizar_sistema_y_descargar_script
+    actualizar_sistema_y_crear_script
     cambiar_contraseña_kali
     cambiar_contraseña_root
     crear_usuario
@@ -183,7 +191,7 @@ procesar_opciones() {
                 cambiar_claves_ssh
                 ;;
             2)
-                actualizar_sistema_y_descargar_script
+                actualizar_sistema_y_crear_script
                 ;;
             3)
                 cambiar_contraseña_kali
