@@ -247,7 +247,7 @@ mostrar_menu() {
     echo "------------------------------"
     echo "99. SALIR"
     echo "------------------------------"
-    read -p "Ingresa tus opciones: " opciones
+    read -p "Ingresá tus opciones: " opciones
 }
 
 # Bucles y control de flujo para poder seleccionar varias opciones
