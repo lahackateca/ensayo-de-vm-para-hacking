@@ -259,4 +259,4 @@ while true; do
         salir
     fi
     procesar_opciones "$opciones"
-donehttps://www.kali.org/docs/virtualization/install-vmware-guest-tools/
+done
