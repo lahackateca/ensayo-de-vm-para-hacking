@@ -1,6 +1,6 @@
 # Ensayo de VM para hacking
 
-![Imagen de ejemplo](./[ejemplo.png](https://github.com/lahackateca/ensayo-de-vm-para-hacking/blob/main/screenshot-menu.png))
+![Imagen de ejemplo](./[screenshot-menu.png])
 
 Este bash script está pensado para evitar el tedio de configurar Kali linux. Las configuraciones que suelo hacer luego de instalarlo en VMWare son actualizalo, cambiar las claves SSH por defecto, con el agregado de instalar programas que uso para hacking, incluido un script propio.
 Podría mejorarlo añadiendo control de errores por ejemplo, pero la idea es mantenerlo lo más simple posible para que sea fácil de mantener.
