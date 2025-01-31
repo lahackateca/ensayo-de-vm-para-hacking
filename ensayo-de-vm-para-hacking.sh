@@ -65,7 +65,6 @@ actualizar_sistema_y_crear_script() {
     # Se podria añadir que se ejecute solo como un cron job cada semana, pero de momento no parece buena idea, ya que puede romper alguna herramienta
     sudo ln -s ~/.local/bin/actualizar-linux.sh /usr/local/bin/actualizar-linux.sh &&
     sudo actualizar-linux.sh
-
 }
 
 # Cambiar la contraseña del usuario kali
@@ -146,6 +145,19 @@ instalar_programas_hacking() {
     cd ~
 }
 
+## OPTIMIZAR SISTEMA PARA PENTESTING
+
+# Cambiar shell para que muestra fecha, hora, usuario, host, y carpeta desde donde se corre el comando. Útil para proporcionar la información de cuándo se corrieron los comandos si el cliente la pide.
+personalizar_shell() {
+    banner "Personalizando shell..."
+    # Primero se hace copia por las dudas
+    cp ~/.zshrc ~/.zshrc.bak
+    # Después se agrega al zshrc original
+    echo 'export PS1="-[%F{green}%D{%a %b %d-%H:%M:%S}%f]-[%F{green}%n%f@%F{green}%m%f]-\n-[%F{green}%~%f]\$ "' >> ~/.zshrc &&
+    # Y se recarga el zshrc para que se apliquen los cambios
+    source ~/.zshrc
+}
+
 ## SISTEMA
 
 # Función para instalar VM Tools, si estás virtualizando Kali en VMWare
@@ -154,7 +166,6 @@ instalar_vm_tools() {
     banner "Instalando VM Tools..."
     sudo apt update && sudo apt install -y --reinstall open-vm-tools-desktop fuse
 }
-
 
 ### MENÚ
 
@@ -172,6 +183,7 @@ ejecutar_todos_los_comandos() {
     crear_carpeta_scripts
     instalar_programas_hacking
     instalar_vm_tools
+    personalizar_shell
 }
 
 # Función para salir del script
@@ -220,6 +232,9 @@ procesar_opciones() {
             11)
                 instalar_vm_tools
                 ;;
+            12)		
+		personalizar_shell
+                ;;
             *)
                 echo "Marcaste una opción no válida: $opcion"
                 ;;
@@ -242,6 +257,7 @@ mostrar_menu() {
     echo "9. Crear carpeta Scripts"
     echo "10. Instalar programas de hacking"
     echo "11. Instalar VM Tools"
+    echo "12. Personalizar shell"
     echo "------------------------------"
     echo "0. EJECUTAR TODOS LOS COMANDOS"
     echo "------------------------------"
@@ -254,7 +270,7 @@ mostrar_menu() {
 # TODO: Cambiar el número de la opción de salir si se agregan opciones al menú
 while true; do
     mostrar_menu
-    # si el número ingresado es o contiene el número 13, llama a la función salir
+    # si el número ingresado es o contiene el número 99, llama a la función salir
     if [[ $opciones =~ 99 ]]; then
         salir
     fi
