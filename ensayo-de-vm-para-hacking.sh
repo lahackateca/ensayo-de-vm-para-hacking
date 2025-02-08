@@ -130,12 +130,12 @@ instalar_programas_hacking() {
     banner "Descargando e instalando programas de programas-hacking.list..."
     # Iterar sobre cada línea del archivo programas-hacking.list
     while IFS= read -r programa; do
-    banner  "Instalando $programa..."
+    echo -e "${rojoh}Instalando $programa.../n${blanco}"
 
     # Intentar instalar el programa y continuar si hay un error
     sudo apt install "$programa" -y
     if [ $? -ne 0 ]; then
-        banner  "Error al instalar $programa. Continuando con el siguiente..."
+        echo -e "${rojoh}Error al instalar $programa. Continuando con el siguiente.../n${blanco}"
     fi
     done < programas-hacking.list
     # TODO: crear link soft link para correr los programa más usados sin entrar a la carpeta
