@@ -1,5 +1,7 @@
 #!/bin/bash
 
+### VERSIÓN: 1.0.0
+
 # TODO: a futuro. De momento no lo hago para simplificar
 # Archivo de configuración
 # source config.sh
@@ -22,30 +24,71 @@ echo -e "\n
    ${rojoh}:      .     ::.    ${blanco}########### ${rojoh}:::. :::${blanco}##        ###  ####   ${rojoh}:::: :::${blanco}  ###      ###         ###.          #### ####           
       ${rojoh}:. :.    :::     ${blanco}##########${rojoh}-:::   :::${blanco}#+        ### #####  ${rojoh}:::.  :::${blanco}  ###      ##########+ ###          ####   ####          
        ${rojoh}.     .:::      ${blanco}####    #${rojoh}::::    :::${blanco}###.  ##  ###### ###${rojoh}:::    :::${blanco}  ###      ###         ####.  ##   ####    ####          
-         ${rojoh}:  .:         ${blanco}####    ###      ${rojoh}:::${blanco} #######  #####   ###      ${rojoh}:::${blanco}  ###      ###########  ######### .####     ####         
+         ${rojoh}:  .:         ${blanco}####    ###      ${rojoh}:::${blanco} #######  #####   ###      ${rojoh}:::${blanco}  ###      ###########  ########  .####     ####         
                        ####    ###      ${rojoh}:::${blanco} :#####   #####    ###     ${rojoh}:::${blanco}  ###      ###########   :######  ####      .####        
 \n"
 
 # nombre del script
-echo -e "${aguamarinak}╔═══════════════════════════════════╗
-                     \n      Ensayo de VM para hacking
-                     \n╚═══════════════════════════════════╝${blanco}"
+echo -e "${aguamarinak}╔══╦▓╦══════════════════════════════════╦╦╗
+║  ║▓║  Ensayo de VM para hacking       ║▒║
+╚══╩▓╩══════════════════════════════════╩╩╝${blanco}\n"
 
 
-### FUNCIONES
+## FUNCIONES GENERALES
 
-## GENERALES DEL PROGRAMA
+# función para diseñar los enunciados de los comandos
+function banner_de_comandos() {
+  printf "${rojoh}\n> $1${blanco}\n"
+}
 
-# Comando para diseñar los enunciados de los comandos
-function banner() {
-  printf "${rojoh}\n>>> $1${blanco}\n"
+# Actualización del script
+function actualizar_script {
+    # Variables
+    REPO="lahackateca/ensayo-de-vm-para-hacking"
+    # Busca dónde está el script local
+    SCRIPT_LOCAL=$(realpath "$0")
+    # Obtener el número de versión del script local
+    VERSION_LOCAL=$(sed -n '3p' ${SCRIPT_LOCAL} | cut -d ' ' -f 3)
+    # Chequear la última versión que figura dentro del script en GitHub
+    VERSION_DEL_REPO=$(curl -s https://raw.githubusercontent.com/${REPO}/main/ensayo-de-vm-para-hacking.sh)
+    if [ $? -ne 0 ]; then
+        echo "Error al obtener la versión del repositorio."
+        exit 1
+    fi
+    # Guardar el script remoto en un archivo temporal
+    echo "${VERSION_DEL_REPO}" > /tmp/ensayo-de-vm-para-hacking-copia-repo.sh
+    if [ $? -ne 0 ]; then
+        echo "Error al guardar el script remoto en un archivo temporal."
+        exit 1
+    fi
+    # Obtener el número de versión del script remoto
+    VERSION_ULTIMA=$(sed -n '3p' /tmp/ensayo-de-vm-para-hacking-copia-repo.sh | cut -d ' ' -f 3)
+    # Mostrar la versión local y la última versión
+    echo -e "Versión: ${VERSION_LOCAL}. Última versión: ${VERSION_ULTIMA}"
+    # Comparar las versiones
+    if [ "$(printf '%s\n' "${VERSION_LOCAL}" "${VERSION_ULTIMA}" | sort -V | head -n1)" != "${VERSION_ULTIMA}" ]; then
+        echo "Nueva versión encontrada. Actualizando..."
+        sudo cp /tmp/ensayo-de-vm-para-hacking-copia-repo.sh ${SCRIPT_LOCAL}
+        if [ $? -ne 0 ]; then
+            echo "Error al copiar el script actualizado. Asegúrate de tener permisos de superusuario."
+            rm /tmp/ensayo-de-vm-para-hacking-copia-repo.sh
+            exit 1
+        fi
+        echo -e "Actualización completada. Saliendo...\n"
+        exit 0
+    else
+        echo -e "No se encontraron actualizaciones.\n"
+    fi
+
+    # Limpiar el archivo temporal
+    rm /tmp/el-pequenio-pentester-ilustrado-copia-repo.sh
 }
 
 ## SEGURIDAD
 
 # Cambiar las claves SSH que viene por defecto
 cambiar_claves_ssh() {
-    banner "Cambiando las claves SSH..."
+    banner_de_comandos "Cambiando las claves SSH..."
     printf "\nRespaldando las claves por defecto\n" &&
     cd /etc/ssh &&
     mkdir keys_backup_ssh &&
@@ -58,7 +101,7 @@ cambiar_claves_ssh() {
 
 # Actualizar el sistema y generar el script de actualización
 actualizar_sistema_y_crear_script() {
-    banner "Creando y ejecutando el script de actualización..."
+    banner_de_comandos "Creando y ejecutando el script de actualización..."
     echo "sudo apt update -y && sudo apt full-upgrade -y && sudo apt --purge autoremove -y && sudo apt autoclean -y" > ~/.local/bin/actualizar-linux.sh &&
     chmod 700  ~/.local/bin/actualizar-linux.sh &&
     # añado 'soft link' para poder ejecutarlo siempre.
@@ -69,7 +112,7 @@ actualizar_sistema_y_crear_script() {
 
 # Cambiar la contraseña del usuario kali
 cambiar_contraseña_kali() {
-    banner "Cambiando la contraseña del usuario kali..."
+    banner_de_comandos "Cambiando la contraseña del usuario kali..."
     # Acá se pide cuál va a ser el nuevo password del usuario Kali. No es necesario hacer tantos pasos, decidí agregar complejidad para dejar el script listo para automatizar esta parte, ya que se puede setear una variable acá o antes
     echo -n "¿Cuál es la nueva contraseña del usuario Kali? "
     read nuevo_password_kali
@@ -78,13 +121,13 @@ cambiar_contraseña_kali() {
 
 # Cambiar la contraseña de root
 cambiar_contraseña_root() {
-    banner "Cambiando la contraseña de root..."
+    banner_de_comandos "Cambiando la contraseña de root..."
     sudo passwd root
 }
 
 # Crear un nuevo usuario
 crear_usuario() {
-    banner "Creando un nuevo usuario..."
+    banner_de_comandos "Creando un nuevo usuario..."
     echo -n "Ingresa el nombre del usuario: "
     read usuario
     sudo adduser "$usuario"
@@ -94,7 +137,7 @@ crear_usuario() {
 
 # Cambiar el layout del teclado a Español (España). Créditos a PimpMyKali por la linea donde se lee el idioma actual - https://github.com/Dewalt-arch/pimpmykali)
 cambiar_teclado_a_esp() {
-    banner "Cambiando el idioma del teclado a Español (España)..."
+    banner_de_comandos "Cambiando el idioma del teclado a Español (España)..."
     sudo sed -i 's/XKBOPTIONS="[^"]*"/XKBOPTIONS="\"es\""/' /etc/default/keyboard
     sudo sed -i 's/XKBLAYOUT="[^"]*"/XKBLAYOUT="es"/' /etc/default/keyboard
     sudo service keyboard-setup restart
@@ -112,7 +155,7 @@ cambiar_zona_horaria() {
 
 # Habilitar SSH
 instalar_y_habilitar_ssh() {
-    banner "Habilitando SSH..."
+    banner_de_comandos "Habilitando SSH..."
     sudo apt install openssh-server -y
     sudo systemctl enable ssh
     sudo systemctl start ssh
@@ -121,13 +164,13 @@ instalar_y_habilitar_ssh() {
 # Crear carpeta Scripts en Home, para instalar las herramientas
 # TODO: modificarla para que cree carpetas para proyectos
 crear_carpeta_scripts() {
-    banner "Creando estructura de carpetas..."
+    banner_de_comandos "Creando estructura de carpetas..."
     mkdir ~/scripts && cd ~
 }
 
 # Descargar e instalar programas de la lista de La Hackateca
 instalar_programas_hacking() {
-    banner "Descargando e instalando programas de programas-hacking.list..."
+    banner_de_comandos "Descargando e instalando programas de programas-hacking.list..."
     # Iterar sobre cada línea del archivo programas-hacking.list
     while IFS= read -r programa; do
     echo -e "${rojoh}Instalando $programa.../n${blanco}"
@@ -139,12 +182,12 @@ instalar_programas_hacking() {
     fi
     done < programas-hacking.list
     # TODO: crear link soft link para correr los programa más usados sin entrar a la carpeta
-    banner "Instalando programas desde programas-hacking-de-git.sh..."
+    banner_de_comandos "Instalando programas desde programas-hacking-de-git.sh..."
     curl -s https://raw.githubusercontent.com/lahackateca/proyectos/main/programas-hacking-de-git.sh | bash
     rm programas-hacking.list
     rm programas-hacking-de-git.sh
     # descargar el pequenio pentester ilustrado
-    banner "Instalando 'El pequeño pentester ilustrado'..."
+    banner_de_comandos "Instalando 'El pequeño pentester ilustrado'..."
     wget "https://raw.githubusercontent.com/lahackateca/el-pequenio-pentester-ilustrado/refs/heads/main/el-pequenio-pentester-ilustrado.sh" &&
     chmod 700 el-pequenio-pentester-ilustrado.sh &&
     # crear link soft link para correr el programa sin entrar a la carpeta
@@ -156,7 +199,7 @@ instalar_programas_hacking() {
 
 # Cambiar shell para que muestra fecha, hora, usuario, host, y carpeta desde donde se corre el comando. Útil para proporcionar la información de cuándo se corrieron los comandos si el cliente la pide.
 personalizar_shell() {
-    banner "Personalizando shell..."
+    banner_de_comandos "Personalizando shell..."
     # Primero se hace copia por las dudas
     cp ~/.zshrc ~/.zshrc.bak
     # Después se agrega al zshrc original
@@ -170,15 +213,42 @@ personalizar_shell() {
 # Función para instalar VM Tools, si estás virtualizando Kali en VMWare
 # https://www.kali.org/docs/virtualization/install-vmware-guest-tools/
 instalar_vm_tools() {
-    banner "Instalando VM Tools..."
+    banner_de_comandos "Instalando VM Tools..."
     sudo apt update && sudo apt install -y --reinstall open-vm-tools-desktop fuse
+}
+
+# Sugerencias de HTB Academy, mejoras de inicio de aplicaciones, privacidad, deshabilitación de servicios innecesarios, y más
+# TODO: usar una lista en github, como con los programas para hacking
+instalar_programas_de_sistema() {
+    banner_de_comandos "Instalando programas de sistema..."
+
+    # Lista de programas a instalar
+    programas=(
+        "preload"
+        "bleachbit"
+        "bum"
+        "apt-file"
+        "scrub"
+        "shutter"
+        "chkrootkit"
+    )
+
+    # Instalar cada programa
+    for programa in "${programas[@]}"; do
+        echo -e "${rojoh}Instalando $programa...${blanco}"
+        if [ "$programa" == "shutter" ]; then
+            add-apt-repository -y ppa:linuxuprising/shutter &&
+            apt-get update
+        fi
+        apt-get install -y "$programa"
+    done
 }
 
 ### MENÚ
 
 # Función para ejecutar todos los pasos
 ejecutar_todos_los_comandos() {
-    banner "Ejecutando todas las opciones..."
+    banner_de_comandos "Ejecutando todas las opciones..."
     cambiar_claves_ssh
     actualizar_sistema_y_crear_script
     cambiar_contraseña_kali
@@ -190,12 +260,13 @@ ejecutar_todos_los_comandos() {
     crear_carpeta_scripts
     instalar_programas_hacking
     instalar_vm_tools
+    instalar_programas_de_sistema
     personalizar_shell
 }
 
 # Función para salir del script
 salir() {
-    banner "Saliendo..."
+    banner_de_comandos "Saliendo..."
     exit 0
 }
 
@@ -239,8 +310,11 @@ procesar_opciones() {
             11)
                 instalar_vm_tools
                 ;;
-            12)		
-		personalizar_shell
+            12)
+                instalar_programas_de_sistema
+                ;;                
+            13)		
+		        personalizar_shell
                 ;;
             *)
                 echo "Marcaste una opción no válida: $opcion"
@@ -251,8 +325,9 @@ procesar_opciones() {
 
 # Menú interactivo
 mostrar_menu() {
-    echo "Elegí una opción (o podés ingresar múltiples opciones separadas por espacio):"
-    echo "------------------------------"
+    echo -e "\n"
+    echo -e "${aguamarinak}Elegí una opción (o podés ingresar múltiples opciones separadas por espacio):${blanco}"
+    echo -e "${aguamarinak}------------------------------${blanco}"
     echo "1. Cambiar claves SSH de Kali"
     echo "2. Actualizar Kali y descargar script"
     echo "3. Cambiar la contraseña de usuario kali"
@@ -264,13 +339,14 @@ mostrar_menu() {
     echo "9. Crear carpeta Scripts"
     echo "10. Instalar programas de hacking"
     echo "11. Instalar VM Tools"
-    echo "12. Personalizar shell"
-    echo "------------------------------"
+    echo "12. Instalar programas de sistema"
+    echo "13. Personalizar shell"
+    echo -e "${aguamarinak}------------------------------${blanco}"
     echo "0. EJECUTAR TODOS LOS COMANDOS"
-    echo "------------------------------"
+    echo -e "${aguamarinak}------------------------------${blanco}"
     echo "99. SALIR"
-    echo "------------------------------"
-    read -p "Ingresá tus opciones: " opciones
+    echo -e "${aguamarinak}------------------------------${blanco}"
+    read -p "Ingresá tu(s) opción(es): " opciones
 }
 
 # Bucles y control de flujo para poder seleccionar varias opciones
