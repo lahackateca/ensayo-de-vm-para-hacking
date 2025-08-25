@@ -1,6 +1,6 @@
 #!/bin/bash
 
-### VERSIÓN: 1.0.0
+### VERSIÓN: 1.0.1
 
 # TODO: a futuro. De momento no lo hago para simplificar
 # Archivo de configuración
