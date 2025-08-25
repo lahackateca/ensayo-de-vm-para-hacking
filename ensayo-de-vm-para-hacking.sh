@@ -171,16 +171,23 @@ crear_carpeta_scripts() {
 # Descargar e instalar programas de la lista de La Hackateca
 instalar_programas_hacking() {
     banner_de_comandos "Descargando e instalando programas de programas-hacking.list..."
-    # Iterar sobre cada línea del archivo programas-hacking.list
-    while IFS= read -r programa; do
-    echo -e "${rojoh}Instalando $programa.../n${blanco}"
-
-    # Intentar instalar el programa y continuar si hay un error
-    sudo apt install "$programa" -y
-    if [ $? -ne 0 ]; then
-        echo -e "${rojoh}Error al instalar $programa. Continuando con el siguiente.../n${blanco}"
-    fi
-    done < programas-hacking.list
+	# Iterar sobre cada línea del archivo programas-hacking.list
+	while IFS= read -r programa; do
+	    # Saltar líneas vacías o comentarios
+	    [[ -z "$programa" || "$programa" =~ ^# ]] && continue
+	
+	    # Verificar si el programa ya está instalado
+	    if dpkg -s "$programa" &> /dev/null; then
+	        echo -e "${blanco}[✔] $programa ya está instalado. Salteando...${blanco}"
+	        continue
+	    fi
+	
+	    echo -e "${rojoh}Instalando $programa...${blanco}"
+	    # Intentar instalar el programa y continuar si hay un error
+	    if ! sudo apt install "$programa" -y; then
+	        echo -e "${rojoh}Error al instalar $programa. Continuando con el siguiente...${blanco}"
+	    fi
+	done < programas-hacking.list
     # TODO: crear link soft link para correr los programa más usados sin entrar a la carpeta
     banner_de_comandos "Instalando programas desde programas-hacking-de-git.sh..."
     curl -s https://raw.githubusercontent.com/lahackateca/proyectos/main/programas-hacking-de-git.sh | bash
