@@ -35,6 +35,48 @@ echo -e "${aguamarinak}╔══╦▓╦═════════════
 
 
 ## FUNCIONES GENERALES
+# Actualización del script
+function actualizar_script {
+    # Variables
+    REPO="lahackateca/ensayo-de-vm-para-hacking"
+    # Donde está el script local. Cambiar si es necesario
+    SCRIPT_LOCAL="/usr/bin/ensayo-de-vm-para-hacking.sh"
+    # Obtener el número de versión del script local
+    VERSION_LOCAL=$(sed -n '3p' ${SCRIPT_LOCAL} | cut -d ' ' -f 3)
+    # Chequear la última versión que figura dentro del script en GitHub
+    VERSION_DEL_REPO=$(curl -s https://raw.githubusercontent.com/${REPO}/main/ensayo-de-vm-para-hacking.sh)
+    if [ $? -ne 0 ]; then
+        echo "Error al obtener la versión del repositorio."
+        exit 1
+    fi
+    # Guardar el script remoto en un archivo temporal
+    echo "${VERSION_DEL_REPO}" > /tmp/el-pequenio-pentester-ilustrado-copia-repo.sh
+    if [ $? -ne 0 ]; then
+        echo "Error al guardar el script remoto en un archivo temporal."
+        exit 1
+    fi
+    # Obtener el número de versión del script remoto
+    VERSION_ULTIMA=$(sed -n '3p' /tmp/el-pequenio-pentester-ilustrado-copia-repo.sh | cut -d ' ' -f 3)
+    # Mostrar la versión local y la última versión
+    echo -e "Versión: ${VERSION_LOCAL}. Última versión: ${VERSION_ULTIMA}"
+    # Comparar las versiones
+    if [ "$(printf '%s\n' "${VERSION_LOCAL}" "${VERSION_ULTIMA}" | sort -V | head -n1)" != "${VERSION_ULTIMA}" ]; then
+        echo "Nueva versión encontrada. Actualizando..."
+        sudo cp /tmp/el-pequenio-pentester-ilustrado-copia-repo.sh ${SCRIPT_LOCAL}
+        if [ $? -ne 0 ]; then
+            echo "Error al copiar el script actualizado. Asegúrate de tener permisos de superusuario."
+            rm /tmp/el-pequenio-pentester-ilustrado-copia-repo.sh
+            exit 1
+        fi
+        echo -e "Actualización completada. Saliendo...\n"
+        exit 0
+    else
+        echo -e "No se encontraron actualizaciones.\n"
+    fi
+
+    # Limpiar el archivo temporal
+    rm /tmp/el-pequenio-pentester-ilustrado-copia-repo.sh
+}
 
 # función para diseñar los enunciados de los comandos
 function banner_de_comandos() {
@@ -357,6 +399,9 @@ mostrar_menu() {
     read -p "Ingresá tu(s) opción(es): " opciones
 }
 
+## Iniciar programa
+# Chequear por actualización de este script
+actualizar_script
 # Bucles y control de flujo para poder seleccionar varias opciones
 # TODO: Cambiar el número de la opción de salir si se agregan opciones al menú
 while true; do
