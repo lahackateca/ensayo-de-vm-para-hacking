@@ -142,14 +142,23 @@ cambiar_claves_ssh() {
 }
 
 # Actualizar el sistema y generar el script de actualización
+# Actualizar el sistema y generar el script de actualización
 actualizar_sistema_y_crear_script() {
     banner_de_comandos "Creando y ejecutando el script de actualización..."
-    echo "sudo apt update -y && sudo apt full-upgrade -y && sudo apt --purge autoremove -y && sudo apt autoclean -y" > ~/.local/bin/actualizar-linux.sh &&
-    chmod 700  ~/.local/bin/actualizar-linux.sh &&
-    # añado 'soft link' para poder ejecutarlo siempre.
-    # Se podria añadir que se ejecute solo como un cron job cada semana, pero de momento no parece buena idea, ya que puede romper alguna herramienta
-    sudo ln -s ~/.local/bin/actualizar-linux.sh /usr/local/bin/actualizar-linux.sh &&
-    sudo actualizar-linux.sh
+    # Verificar si el enlace simbólico ya existe
+    if [ -L /usr/local/bin/actualizar-linux.sh ]; then
+        echo -e "${blanco}[✔] El enlace simbólico ya existe. No se necesita ejecutar la función nuevamente.${blanco}"
+		# Ejecutar el script porque se llamó a la función
+        sudo actualizar-linux.sh
+        return 0
+    else
+		# Configurar el script de actualizar el sistema
+        echo "sudo apt update -y && sudo apt full-upgrade -y && sudo apt --purge autoremove -y && sudo apt autoclean -y" > ~/.local/bin/actualizar-linux.sh
+        chmod 700 ~/.local/bin/actualizar-linux.sh
+        sudo ln -s ~/.local/bin/actualizar-linux.sh /usr/local/bin/actualizar-linux.sh
+        # Ejecutar el script
+        sudo actualizar-linux.sh
+    fi
 }
 
 # Cambiar la contraseña del usuario kali
