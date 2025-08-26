@@ -171,6 +171,7 @@ crear_carpeta_scripts() {
 # Descargar e instalar programas de la lista de La Hackateca
 instalar_programas_hacking() {
     banner_de_comandos "Descargando e instalando programas de programas-hacking.list..."
+	curl -s https://raw.githubusercontent.com/lahackateca/compendio/refs/heads/main/programas-hacking.list -o programas-hacking.list
 	# Iterar sobre cada línea del archivo programas-hacking.list
 	while IFS= read -r programa; do
 	    # Saltar líneas vacías o comentarios
