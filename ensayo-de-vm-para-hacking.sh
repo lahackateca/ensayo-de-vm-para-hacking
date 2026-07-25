@@ -1,7 +1,7 @@
 #!/bin/bash
 
-### VERSIÓN: 1.0.4
-VERSION="1.0.4"
+# modificar en linea 60
+VERSION="1.0.5"
 
 # Manejo seguro de directorio temporal y limpieza al salir
 TMP_DIR=$(mktemp -d /tmp/pentester_vm_XXXXXX)
@@ -58,7 +58,7 @@ function actualizar_script {
     local REPO="lahackateca/ensayo-de-vm-para-hacking"
     local SCRIPT_LOCAL
     SCRIPT_LOCAL=$(realpath "$0")
-    local VERSION_LOCAL="${VERSION:-1.0.4}"
+    local VERSION_LOCAL="${VERSION:-1.0.5}"
     
     # Asegurar que exista un directorio temporal válido
     local DIR_TEMPORAL="${TMP_DIR:-/tmp}"
@@ -72,7 +72,7 @@ function actualizar_script {
         return 1
     fi
 
-    # Extraer la versión remota (ej: "VERSIÓN: 1.0.4")
+    # Extraer la versión remota
     local VERSION_ULTIMA
     VERSION_ULTIMA=$(grep -i "VERSIÓN:" "$TMP_REPO_SCRIPT" | head -n 1 | awk '{print $3}')
     
@@ -238,11 +238,16 @@ instalar_programas_hacking() {
 
     # Descargar el pequeño pentester ilustrado
     banner_de_comandos "Instalando 'El pequeño pentester ilustrado'..."
-    local script_dest="/usr/local/bin/el-pequenio-pentester-ilustrado.sh"
-    if sudo wget -q "https://raw.githubusercontent.com/lahackateca/el-pequenio-pentester-ilustrado/refs/heads/main/el-pequenio-pentester-ilustrado.sh" -O "$script_dest"; then
+    # Nota: El destino no tiene la extensión .sh para poder usarlo como comando directo
+    local script_dest="/usr/local/bin/el-pequenio-pentester-ilustrado"
+    local tmp_script="/tmp/el-pequenio-pentester-tmp.sh"
+
+    if wget -q "https://raw.githubusercontent.com/lahackateca/el-pequenio-pentester-ilustrado/refs/heads/main/el-pequenio-pentester-ilustrado.sh" -O "$tmp_script"; then
+        sudo mv "$tmp_script" "$script_dest"
         sudo chmod 755 "$script_dest"
         echo -e "${verde}[+] 'El pequeño pentester ilustrado' instalado en $script_dest${blanco}"
     else
+        rm -f "$tmp_script"
         echo -e "${rojoh}[-] Error al descargar 'El pequeño pentester ilustrado'.${blanco}"
     fi
 }
