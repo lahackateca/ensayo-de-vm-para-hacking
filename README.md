@@ -22,11 +22,11 @@ Podría mejorarlo añadiendo control de errores por ejemplo, pero la idea es man
 
 ## Instalación y ejecución en una línea:
 ```bash
-wget "https://raw.githubusercontent.com/lahackateca/ensayo-de-vm-para-hacking/refs/heads/main/ensayo-de-vm-para-hacking.sh" &&
-chmod 700 ensayo-de-vm-para-hacking.sh && 
-sudo cp ensayo-de-vm-para-hacking.sh /usr/local/bin/ensayo-de-vm-para-hacking.sh && 
-rm ensayo-de-vm-para-hacking.sh && 
-sudo ensayo-de-vm-para-hacking.sh
+rm -f ensayo-de-vm-para-hacking* && \
+wget "https://raw.githubusercontent.com/lahackateca/ensayo-de-vm-para-hacking/refs/heads/main/ensayo-de-vm-para-hacking.sh" -O ensayo-de-vm-para-hacking.sh && \
+sudo mv ensayo-de-vm-para-hacking.sh /usr/local/bin/ensayo-de-vm-para-hacking && \
+sudo chmod +x /usr/local/bin/ensayo-de-vm-para-hacking && \
+sudo /usr/local/bin/ensayo-de-vm-para-hacking
 ```
 
 
