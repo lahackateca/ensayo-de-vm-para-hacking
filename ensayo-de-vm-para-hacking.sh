@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="1.0.5"
+VERSION="1.0.6"
 
 # Manejo seguro de directorio temporal y limpieza al salir
 TMP_DIR=$(mktemp -d /tmp/pentester_vm_XXXXXX)
@@ -217,7 +217,7 @@ instalar_programas_hacking() {
 
         # Verificar si el programa ya está instalado
         if dpkg -s "$programa" &> /dev/null; then
-            echo -e "${blanco}[✔] $programa ya está instalado. Salteando...${blanco}"
+            echo -e "${rojoh}[✔] $programa ya está instalado. Salteando...${blanco}"
             continue
         fi
 
@@ -244,7 +244,7 @@ instalar_programas_hacking() {
     if wget -q "https://raw.githubusercontent.com/lahackateca/el-pequenio-pentester-ilustrado/refs/heads/main/el-pequenio-pentester-ilustrado.sh" -O "$tmp_script"; then
         sudo mv "$tmp_script" "$script_dest"
         sudo chmod 755 "$script_dest"
-        echo -e "${verde}[+] 'El pequeño pentester ilustrado' instalado en $script_dest${blanco}"
+        echo -e "${rojoh}[+] 'El pequeño pentester ilustrado' instalado en $script_dest${blanco}"
     else
         rm -f "$tmp_script"
         echo -e "${rojoh}[-] Error al descargar 'El pequeño pentester ilustrado'.${blanco}"
@@ -278,9 +278,9 @@ personalizar_shell() {
 instalar_programas_de_sistema() {
     banner_de_comandos "Instalando programas de sistema..."
     local programas=(
-        "preload"
+        #"preload"
         "bleachbit"
-        "bum"
+        #"bum"
         "apt-file"
         "scrub"
         "shutter"
@@ -379,7 +379,7 @@ procesar_opciones() {
 # Menú interactivo
 mostrar_menu() {
     echo -e "\n"
-    echo -e "${aguamarinak}Elegí una opción (o podés ingresar múltiples opciones separadas por espacio):${blanco}"
+    echo -e "${aguamarinak}Elegí una o más opciones (ej.: 1 2 7 11):${blanco}"
     echo -e "${aguamarinak}------------------------------${blanco}"
     echo "1. Cambiar claves SSH de Kali"
     echo "2. Actualizar Kali y crear script de actualización"
