@@ -1,7 +1,7 @@
 #!/bin/bash
 
-### VERSIÓN: 1.0.3
-VERSION="1.0.3"
+### VERSIÓN: 1.0.4
+VERSION="1.0.4"
 
 # Manejo seguro de directorio temporal y limpieza al salir
 TMP_DIR=$(mktemp -d /tmp/pentester_vm_XXXXXX)
@@ -47,46 +47,59 @@ function banner_de_comandos() {
 }
 
 # Actualización del script
+
+# Función auxiliar para comparar si la versión local es estrictamente menor a la remota
+function version_menor {
+    [ "$1" != "$2" ] && [ "$(printf '%s\n' "$1" "$2" | sort -V | head -n1)" = "$1" ]
+}
+
 function actualizar_script {
     # Variables
     local REPO="lahackateca/ensayo-de-vm-para-hacking"
-    # Busca dónde está el script local
     local SCRIPT_LOCAL
     SCRIPT_LOCAL=$(realpath "$0")
-    local VERSION_LOCAL="${VERSION:-1.0.3}"
-    local TMP_REPO_SCRIPT="$TMP_DIR/ensayo-de-vm-para-hacking-copia-repo.sh"
+    local VERSION_LOCAL="${VERSION:-1.0.4}"
+    
+    # Asegurar que exista un directorio temporal válido
+    local DIR_TEMPORAL="${TMP_DIR:-/tmp}"
+    mkdir -p "$DIR_TEMPORAL"
+    local TMP_REPO_SCRIPT="$DIR_TEMPORAL/ensayo-de-vm-para-hacking-copia-repo.sh"
 
-    # Chequear la última versión que figura dentro del script en GitHub
-    local VERSION_DEL_REPO
-    if ! VERSION_DEL_REPO=$(curl -s "https://raw.githubusercontent.com/${REPO}/main/ensayo-de-vm-para-hacking.sh"); then
-        echo "Error al obtener la versión del repositorio."
+    # Descargar el script remoto
+    echo "Buscando actualizaciones..."
+    if ! curl -s "https://raw.githubusercontent.com/${REPO}/main/ensayo-de-vm-para-hacking.sh" -o "$TMP_REPO_SCRIPT"; then
+        echo "Error al conectar con GitHub para obtener la última versión."
         return 1
     fi
-    # Guardar el script remoto en un archivo temporal
-    echo "${VERSION_DEL_REPO}" > "$TMP_REPO_SCRIPT"
 
-    # Obtener el número de versión del script remoto (buscando la etiqueta VERSIÓN:)
+    # Extraer la versión remota (ej: "VERSIÓN: 1.0.4")
     local VERSION_ULTIMA
     VERSION_ULTIMA=$(grep -i "VERSIÓN:" "$TMP_REPO_SCRIPT" | head -n 1 | awk '{print $3}')
     
     if [ -z "$VERSION_ULTIMA" ]; then
-        echo "No se pudo determinar la versión remota."
+        echo "No se pudo determinar la versión remota. Cancelo la actualización."
+        rm -f "$TMP_REPO_SCRIPT"
         return 1
     fi
 
-    # Mostrar la versión local y la última versión
-    echo -e "Versión: ${VERSION_LOCAL}. Última versión: ${VERSION_ULTIMA}"
-    # Comparar las versiones
-    if [ "$(printf '%s\n' "${VERSION_LOCAL}" "${VERSION_ULTIMA}" | sort -V | head -n1)" != "${VERSION_ULTIMA}" ]; then
-        echo "Nueva versión encontrada. Actualizando..."
-        if ! sudo cp "$TMP_REPO_SCRIPT" "${SCRIPT_LOCAL}"; then
-            echo "Error al copiar el script actualizado. Asegúrate de tener permisos de superusuario."
+    echo -e "Versión local: ${VERSION_LOCAL} | Última versión: ${VERSION_ULTIMA}"
+
+    # Comparación robusta
+    if version_menor "${VERSION_LOCAL}" "${VERSION_ULTIMA}"; then
+        echo "Nueva versión disponible (${VERSION_ULTIMA}). Actualizando..."
+        
+        if ! sudo cp "$TMP_REPO_SCRIPT" "${SCRIPT_LOCAL}" || ! sudo chmod +x "${SCRIPT_LOCAL}"; then
+            echo "Error al actualizar el script en ${SCRIPT_LOCAL}. Verifica permisos de superusuario."
+            rm -f "$TMP_REPO_SCRIPT"
             return 1
         fi
-        echo -e "Actualización completada. Saliendo...\n"
+        
+        rm -f "$TMP_REPO_SCRIPT"
+        echo -e "Actualización completada exitosamente. Saliendo...\n"
         exit 0
     else
-        echo -e "No se encontraron actualizaciones.\n"
+        echo -e "El script ya está actualizado.\n"
+        rm -f "$TMP_REPO_SCRIPT"
     fi
 }
 
