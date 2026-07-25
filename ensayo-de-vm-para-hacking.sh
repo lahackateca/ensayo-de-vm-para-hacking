@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# modificar en linea 60
 VERSION="1.0.5"
 
 # Manejo seguro de directorio temporal y limpieza al salir
@@ -58,7 +57,7 @@ function actualizar_script {
     local REPO="lahackateca/ensayo-de-vm-para-hacking"
     local SCRIPT_LOCAL
     SCRIPT_LOCAL=$(realpath "$0")
-    local VERSION_LOCAL="${VERSION:-1.0.5}"
+    local VERSION_LOCAL="${VERSION}"
     
     # Asegurar que exista un directorio temporal válido
     local DIR_TEMPORAL="${TMP_DIR:-/tmp}"
@@ -72,9 +71,9 @@ function actualizar_script {
         return 1
     fi
 
-    # Extraer la versión remota
+    # Extraer el valor exacto de VERSION="X.Y.Z" del repo
     local VERSION_ULTIMA
-    VERSION_ULTIMA=$(grep -i "VERSIÓN:" "$TMP_REPO_SCRIPT" | head -n 1 | awk '{print $3}')
+    VERSION_ULTIMA=$(grep -E '^VERSION=' "$TMP_REPO_SCRIPT" | head -n 1 | cut -d'=' -f2 | tr -d '"' | tr -d "'")
     
     if [ -z "$VERSION_ULTIMA" ]; then
         echo "No se pudo determinar la versión remota. Cancelo la actualización."
@@ -84,7 +83,7 @@ function actualizar_script {
 
     echo -e "Versión local: ${VERSION_LOCAL} | Última versión: ${VERSION_ULTIMA}"
 
-    # Comparación robusta
+    # Comparación de versiones
     if version_menor "${VERSION_LOCAL}" "${VERSION_ULTIMA}"; then
         echo "Nueva versión disponible (${VERSION_ULTIMA}). Actualizando..."
         
