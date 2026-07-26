@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="1.0.6"
+VERSION="1.0.7"
 
 # Manejo seguro de directorio temporal y limpieza al salir
 TMP_DIR=$(mktemp -d /tmp/pentester_vm_XXXXXX)
@@ -234,6 +234,15 @@ instalar_programas_hacking() {
     if [ -f "$git_script" ]; then
         (cd "$home_dir" && bash "$git_script")
     fi
+
+    # Instalar programas que requieren Go
+    banner_de_comandos "Instalando OWASP Amass..."
+    CGO_ENABLED=0 go install -v github.com/owasp-amass/amass/v5/cmd/amass@main
+    banner_de_comandos "Instalando Subfinder..."
+    go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+    banner_de_comandos "[!] Atención, es necesario correr subfinder y luego configurar las API keys en $HOME/.config/subfinder/provider-config.yaml"
+    banner_de_comandos "Instalando httpX..."
+    go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
 
     # Descargar el pequeño pentester ilustrado
     banner_de_comandos "Instalando 'El pequeño pentester ilustrado'..."
